@@ -142,7 +142,9 @@ module HTTP
 
       uri = HTTP::URI.parse uri
 
-      uri.query_values = uri.query_values(Array).to_a.concat(opts.params.to_a) if opts.params && !opts.params.empty?
+      if opts.params && !opts.params.empty?
+        uri.query = [uri.query, HTTP::URI.form_encode(opts.params)].compact.join("&")
+      end
 
       # Some proxies (seen on WEBRick) fail if URL has
       # empty path (e.g. `http://example.com`) while it's RFC-complaint:
