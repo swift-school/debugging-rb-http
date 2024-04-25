@@ -169,7 +169,7 @@ RSpec.describe HTTP::Client do
 
     it 'does not convert newlines into \r\n before encoding string values' do
       expect(HTTP::Request).to receive(:new) do |opts|
-        expect(opts[:uri].query).to eq "foo=bar%0Abaz"
+        expect(opts[:uri].query).to eq "foo=bar%0Abaz".encode("ASCII-8BIT")
       end
 
       client.get("http://example.com/", :params => {:foo => "bar\nbaz"})
@@ -437,7 +437,7 @@ RSpec.describe HTTP::Client do
         socket_spy = double
 
         chunks = [
-          <<-RESPONSE.gsub(/^\s*\| */, "").gsub(/\n/, "\r\n")
+          <<-RESPONSE.gsub(/^\s*\| */, "").gsub("\n", "\r\n")
           | HTTP/1.1 200 OK
           | Content-Type: text/html
           | Server: WEBrick/1.3.1 (Ruby/1.9.3/2013-11-22)
@@ -466,7 +466,7 @@ RSpec.describe HTTP::Client do
     context "when uses chunked transfer encoding" do
       let(:chunks) do
         [
-          <<-RESPONSE.gsub(/^\s*\| */, "").gsub(/\n/, "\r\n") << body
+          <<-RESPONSE.gsub(/^\s*\| */, "").gsub("\n", "\r\n") << body
           | HTTP/1.1 200 OK
           | Content-Type: application/json
           | Transfer-Encoding: chunked
@@ -476,7 +476,7 @@ RSpec.describe HTTP::Client do
         ]
       end
       let(:body) do
-        <<-BODY.gsub(/^\s*\| */, "").gsub(/\n/, "\r\n")
+        <<-BODY.gsub(/^\s*\| */, "").gsub("\n", "\r\n")
         | 9
         | {"state":
         | 5
@@ -504,7 +504,7 @@ RSpec.describe HTTP::Client do
 
       context "with broken body (too early closed connection)" do
         let(:body) do
-          <<-BODY.gsub(/^\s*\| */, "").gsub(/\n/, "\r\n")
+          <<-BODY.gsub(/^\s*\| */, "").gsub("\n", "\r\n")
           | 9
           | {"state":
           BODY
